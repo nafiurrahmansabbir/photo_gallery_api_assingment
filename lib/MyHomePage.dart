@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'api_photo_and_details.dart';
+import 'imgDetailsPage.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -10,9 +13,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _getProductListInProgram=false;
-
-
 
   @override
 
@@ -20,7 +20,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Photos'),
+        backgroundColor: Colors.blue,
+        title: Text('Photo Gallery App',style: TextStyle(fontSize: 23,color: Colors.white,fontWeight: FontWeight.w500)),
       ),
       body: FutureBuilder<List<Photo>>(
         future: fetchPhotos(),
@@ -37,9 +38,18 @@ class _MyHomePageState extends State<MyHomePage> {
               itemBuilder: (context, index) {
                 final photo = snapshot.data![index];
                 return ListTile(
-                  leading: Image.network(photo.thumbnailUrl),
+                  leading: GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>details(
+                        url: photo.thumbnailUrl,
+                        title: photo.title,
+                        Id: photo.id,
+                      ),
+                      ));
+                    },
+                    child: Image.network(photo.thumbnailUrl),
+                  ),
                   title: Text(photo.title),
-                  subtitle: Text('ID: ${photo.id}'),
                 );
               },
             );
@@ -67,28 +77,4 @@ class _MyHomePageState extends State<MyHomePage> {
 
 }
 
-class Photo {
-    final int albumId;
-    final int id;
-    final String title;
-    final String url;
-    final String thumbnailUrl;
 
-    Photo({
-      required this.albumId,
-      required this.id,
-      required this.title,
-      required this.url,
-      required this.thumbnailUrl,
-  });
-
-    factory Photo.fromJson(Map<String, dynamic> json) {
-      return Photo(
-        albumId: json['albumId'],
-        id: json['id'],
-        title: json['title'],
-        url: json['url'],
-        thumbnailUrl: json['thumbnailUrl'],
-    );
-  }
-}
